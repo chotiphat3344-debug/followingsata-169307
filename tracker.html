@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet">
+<title>ระบบติดตามผลสาธารณประโยชน์ 1/2569</title>
+<style>
+  :root{
+    --ink:#26282b;
+    --ink-soft:#6b7075;
+    --line:#e2e4e7;
+    --bg:#ffffff;
+    --bg-alt:#fafafb;
+    --accent:#3f6b57;
+    --accent-bg:#eef3f0;
+    --warn:#a4462f;
+    --warn-bg:#faeeec;
+    --dark-green:#1b5e20;
+    --table-bg:#C8FACC;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family: "Sarabun", "Noto Sans Thai", -apple-system, "Segoe UI", sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  header{
+    padding:32px 24px 20px;
+    border-bottom:1px solid var(--line);
+    max-width:1000px;
+    margin:0 auto;
+  }
+  h1{
+    font-size:22px;
+    font-weight:600;
+    margin:0 0 4px;
+    letter-spacing:0.01em;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    color:var(--ink);
+  }
+  h1 svg{
+    width:22px;
+    height:22px;
+    flex-shrink:0;
+    color:var(--ink);
+  }
+  .sub{
+    color:var(--ink-soft);
+    font-size:14px;
+    margin:0;
+  }
+  .wrap{
+    max-width:1000px;
+    margin:0 auto;
+    padding:20px 24px 60px;
+  }
+  .toolbar{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    margin-bottom:14px;
+    font-size:13px;
+    color:var(--ink-soft);
+  }
+  .toolbar input[type="search"]{
+    border:1px solid var(--line);
+    border-radius:6px;
+    padding:7px 10px 7px 32px;
+    font-size:14px;
+    font-family:inherit;
+    color:var(--ink);
+    width:220px;
+  }
+  .search-wrap{
+    position:relative;
+    display:inline-flex;
+    align-items:center;
+  }
+  .search-wrap svg{
+    position:absolute;
+    left:9px;
+    width:15px;
+    height:15px;
+    color:var(--ink-soft);
+    pointer-events:none;
+  }
+  .toolbar input[type="search"]:focus{
+    outline:none;
+    border-color:var(--accent);
+  }
+  .auth-area{
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  .btn{
+    font-family:inherit;
+    font-size:13px;
+    color:var(--ink);
+    background:var(--bg);
+    border:1px solid var(--line);
+    border-radius:6px;
+    padding:7px 12px;
+    cursor:pointer;
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+  }
+  .btn svg{
+    width:14px;
+    height:14px;
+    flex-shrink:0;
+  }
+  .btn:hover{
+    border-color:var(--ink-soft);
+  }
+  .btn.primary{
+    background:var(--accent);
+    border-color:var(--accent);
+    color:#fff;
+  }
+  .status-pill{
+    font-size:13px;
+    color:var(--accent);
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+  }
+  .status-pill svg{
+    width:14px;
+    height:14px;
+  }
+  .status-cell{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+  }
+  .status-cell svg{
+    width:14px;
+    height:14px;
+    flex-shrink:0;
+  }
+  .status-cell[data-val="ส่งแล้ว"] svg{ color:var(--accent); }
+  .status-cell[data-val="ยังไม่ส่ง"] svg{ color:var(--warn); }
+  .status-cell[data-val="อยู่ระหว่างดำเนินการ"] svg{ color:#8a6d1f; }
+  .status-cell[data-val="ไม่ผ่าน"] svg{ color:var(--warn); }
+  .login-box{
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .login-box input{
+    border:1px solid var(--line);
+    border-radius:6px;
+    padding:6px 9px;
+    font-size:13px;
+    font-family:inherit;
+    color:var(--ink);
+    width:110px;
+  }
+  .login-box input:focus{
+    outline:none;
+    border-color:var(--accent);
+  }
+  .login-error{
+    font-size:12px;
+    color:var(--warn);
+  }
+  table{
+    width:100%;
+    border-collapse:collapse;
+    font-size:14.5px;
+    border:1px solid var(--dark-green);
+  }
+  thead th{
+    text-align:left;
+    font-weight:600;
+    color:#ffffff;
+    background:var(--dark-green);
+    font-size:13px;
+    padding:10px 12px;
+    border:1px solid var(--dark-green);
+    white-space:nowrap;
+  }
+  thead .summary-row th{
+    text-align:center;
+    font-size:18px;
+    font-weight:700;
+    color:#ffffff;
+    background:#ff1e1e;
+    padding:12px;
+  }
+  tbody td{
+    padding:9px 12px;
+    border:1px solid var(--dark-green);
+    vertical-align:middle;
+    background:var(--table-bg);
+  }
+  tbody tr:nth-child(even){
+    background:var(--table-bg);
+  }
+  td.num{
+    color:var(--ink-soft);
+    font-variant-numeric:tabular-nums;
+    width:90px;
+  }
+  td.idx{
+    width:40px;
+    color:var(--ink-soft);
+  }
+  select.status{
+    font-family:inherit;
+    font-size:14px;
+    color:var(--ink);
+    border:1px solid var(--line);
+    border-radius:6px;
+    padding:6px 8px;
+    background:var(--bg);
+    min-width:150px;
+  }
+  select.status:focus{
+    outline:none;
+    border-color:var(--accent);
+  }
+  select.status:disabled{
+    color:var(--ink-soft);
+    cursor:not-allowed;
+    opacity:0.85;
+  }
+  select.status[data-val="ส่งแล้ว"]{
+    background:var(--accent-bg);
+    border-color:var(--accent);
+    color:var(--accent);
+  }
+  select.status[data-val="ยังไม่ส่ง"]{
+    background:var(--warn-bg);
+    border-color:var(--warn);
+    color:var(--warn);
+  }
+  .saved-note{
+    font-size:12px;
+    color:var(--ink-soft);
+  }
+  .hidden{display:none;}
+  footer{
+    max-width:1000px;
+    margin:0 auto;
+    padding:0 24px 40px;
+    font-size:12px;
+    color:var(--ink-soft);
+  }
+  footer p{
+    margin:0 0 4px;
+    display:flex;
+    align-items:center;
+    gap:6px;
+  }
+  footer svg{
+    width:13px;
+    height:13px;
+    color:var(--ink-soft);
+    flex-shrink:0;
+  }
+  @media (max-width:640px){
+    .toolbar{flex-direction:column;align-items:flex-start;}
+    .toolbar input[type="search"]{width:100%;}
+    table{font-size:13px;}
+    select.status{min-width:120px;}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4h6a1 1 0 0 1 1 1v1H8V5a1 1 0 0 1 1-1Z"/><path d="M6 6h12a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1Z"/><path d="m9 13 2 2 4-4"/></svg>
+    ระบบติดตามผลสาธารณประโยชน์ 1/2569
+  </h1>
+  <p class="sub">รายชื่อนักเรียน 41 คน — บันทึกผลการส่งงานสาธารณประโยชน์</p>
+</header>
+
+<div class="wrap">
+  <div class="toolbar">
+    <span class="search-wrap">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+      <input type="search" id="search" placeholder="ค้นหาชื่อ หรือเลขประจำตัว">
+    </span>
+    <div class="auth-area" id="authArea">
+      <button class="btn" id="loginToggle">เข้าสู่ระบบเพื่อแก้ไข</button>
+    </div>
+  </div>
+  <div class="toolbar" id="savedRow">
+    <span class="saved-note" id="savedNote"></span>
+  </div>
+
+  <table>
+    <thead>
+      <tr class="summary-row">
+        <th colspan="5">สรุปผลการส่ง</th>
+      </tr>
+      <tr>
+        <th>#</th>
+        <th>เลขประจำตัว</th>
+        <th>ชื่อ</th>
+        <th>นามสกุล</th>
+        <th>ผลการส่ง</th>
+      </tr>
+    </thead>
+    <tbody id="tbody"></tbody>
+  </table>
+</div>
+
+<footer>
+  <p><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v4"/><path d="m6.5 6.5 2.8 2.8"/><path d="M3 13h4"/><path d="m6.5 19.5 2.8-2.8"/><path d="M12 17v4"/><path d="m14.7 16.7 2.8 2.8"/><path d="M17 13h4"/><path d="m14.7 9.3 2.8-2.8"/></svg> ข้อมูลบันทึกอัตโนมัติเมื่อมีการแก้ไข</p>
+  <p><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="m9 8-4 4 4 4"/><path d="m15 8 4 4-4 4"/></svg> Code program : โชติพัฒน์ หนูเยาว์</p>
+  <p><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a9 9 0 1 0 0 18c1 0 1.5-.5 1.5-1.3 0-.4-.2-.7-.4-1-.2-.3-.4-.6-.4-1 0-.8.6-1.4 1.4-1.4H16a4 4 0 0 0 4-4c0-4.4-3.6-8-8-8Z"/><circle cx="7.5" cy="12" r="1"/><circle cx="9.5" cy="8.5" r="1"/><circle cx="14.5" cy="8.5" r="1"/></svg> Graphic design : โชติพัฒน์ หนูเยาว์</p>
+</footer>
+
+<script>
+const students = [
+  ["41579","กฤติธี","แป้นคง"],
+  ["41580","จิรภัทร","จอมประดิษฐ์"],
+  ["41581","โชติพัฒน์","หนูเยาว์"],
+  ["41582","ธนกฤต","พะเนินศรี"],
+  ["41583","ธะรามช์","สิทธิรักษ์"],
+  ["41584","ธีรัตม์","หิรัญกาญจน์"],
+  ["41585","พิริยพงศ์","แซ่อื้อ"],
+  ["41586","ภูธัต","ตราสุวรรณ์"],
+  ["41587","ภูวนัย","รักธรรม"],
+  ["41588","วรเดช","สุริยชน"],
+  ["41589","ศุภกฤต","รักศีล"],
+  ["41590","ศุภณัฐ","คงแป้น"],
+  ["41591","สกลวรรธน์","ช่อระชู"],
+  ["41592","กนกมล","แก้วแกมทอง"],
+  ["41593","กัญชพร","เกิดเมืองเล็ก"],
+  ["41594","กัญญาณัฐ","ไชยฤกษ์"],
+  ["41595","กันตา","สาพรเจริญ"],
+  ["41596","กานต์สิริ","กาญจนสนิท"],
+  ["41597","ชญานุช","เกื้อมา"],
+  ["41598","ญาณิศา","อุไรพันธ์"],
+  ["41599","ฐานิดา","เพียรดี"],
+  ["41600","ณัฏฐณิชา","ภูธรภักดี"],
+  ["41601","ณัฐสุดา","แป้นถนอม"],
+  ["41602","ณิชาภัทร","คงแก้ว"],
+  ["41603","ดวงกมล","สุวรรณโชติ"],
+  ["41604","ตฬปฒี","คงชื่น"],
+  ["41605","ปภาวดี","หนูเกื้อ"],
+  ["41606","พิชญาภา","ขวัญยุบล"],
+  ["41607","พิชฎา","เพชรสีเงิน"],
+  ["41608","พิณพลอย","อินทวงค์"],
+  ["41609","พิรัมภา","ภูมิมาศ"],
+  ["41610","ภัทรมาส","บุญเเก้ว"],
+  ["41611","ภิชญาภา","คุ้มสุข"],
+  ["41612","รวินท์นิภา","แกะประจักษ์"],
+  ["41613","วริศา","รักษรเงิน"],
+  ["41614","สุทธิดา","คงบุญ"],
+  ["41615","อชิรญาณ์","ชูพุฒ"],
+  ["41616","อนันตญา","วาจาสุจริต"],
+  ["41617","อัญรินทร์","วงศ์เดช"],
+  ["41618","อิศราภรณ์","อาจสมัย"],
+  ["42619","ณัฐปภัสร์","ช่วยหนู"]
+];
+
+const STATUS_OPTIONS = ["ยังไม่ส่ง","ส่งแล้ว","อยู่ระหว่างดำเนินการ","ไม่ผ่าน"];
+const STORAGE_KEY = "results-1-2569";
+const ADMIN_USER = "admin";
+const ADMIN_PASS = "sata169";
+let results = {};
+let isEditor = false;
+
+const tbody = document.getElementById("tbody");
+const savedNote = document.getElementById("savedNote");
+const searchInput = document.getElementById("search");
+const authArea = document.getElementById("authArea");
+
+function renderAuthArea(){
+  authArea.innerHTML = "";
+  if(isEditor){
+    const pill = document.createElement("span");
+    pill.className = "status-pill";
+    pill.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m5 13 4 4L19 7"/></svg> เข้าสู่ระบบแล้ว (admin)';
+    const logoutBtn = document.createElement("button");
+    logoutBtn.className = "btn";
+    logoutBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg> ออกจากระบบ';
+    logoutBtn.addEventListener("click", () => {
+      isEditor = false;
+      renderAuthArea();
+      render(searchInput.value);
+    });
+    authArea.append(pill, logoutBtn);
+  }else{
+    const toggleBtn = document.createElement("button");
+    toggleBtn.className = "btn";
+    toggleBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg> เข้าสู่ระบบเพื่อแก้ไข';
+    toggleBtn.addEventListener("click", showLoginForm);
+    authArea.appendChild(toggleBtn);
+  }
+}
+
+function showLoginForm(){
+  authArea.innerHTML = "";
+  const box = document.createElement("div");
+  box.className = "login-box";
+
+  const userInput = document.createElement("input");
+  userInput.type = "text";
+  userInput.placeholder = "Username";
+  userInput.autocomplete = "off";
+
+  const passInput = document.createElement("input");
+  passInput.type = "password";
+  passInput.placeholder = "Password";
+
+  const submitBtn = document.createElement("button");
+  submitBtn.className = "btn primary";
+  submitBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg> เข้าสู่ระบบ';
+
+  const cancelBtn = document.createElement("button");
+  cancelBtn.className = "btn";
+  cancelBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6 6 18"/></svg> ยกเลิก';
+  cancelBtn.addEventListener("click", renderAuthArea);
+
+  const errorMsg = document.createElement("span");
+  errorMsg.className = "login-error";
+
+  function attemptLogin(){
+    if(userInput.value === ADMIN_USER && passInput.value === ADMIN_PASS){
+      isEditor = true;
+      renderAuthArea();
+      render(searchInput.value);
+    }else{
+      errorMsg.textContent = "ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง";
+      passInput.value = "";
+    }
+  }
+
+  submitBtn.addEventListener("click", attemptLogin);
+  passInput.addEventListener("keydown", (e) => { if(e.key === "Enter") attemptLogin(); });
+
+  box.append(userInput, passInput, submitBtn, cancelBtn, errorMsg);
+  authArea.appendChild(box);
+  userInput.focus();
+}
+
+const STATUS_ICONS = {
+  "ยังไม่ส่ง": '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5"/><circle cx="12" cy="16" r="0.5" fill="currentColor"/></svg>',
+  "ส่งแล้ว": '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-5"/></svg>',
+  "อยู่ระหว่างดำเนินการ": '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg>',
+  "ไม่ผ่าน": '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m9 9 6 6M15 9l-6 6"/></svg>'
+};
+
+function noteSaved(){
+  const now = new Date();
+  const t = now.toLocaleTimeString('th-TH', {hour:'2-digit', minute:'2-digit'});
+  savedNote.textContent = "บันทึกล่าสุด " + t;
+}
+
+async function loadResults(){
+  try{
+    const r = await window.storage.get(STORAGE_KEY, true);
+    if(r && r.value){
+      results = JSON.parse(r.value);
+    }
+  }catch(e){
+    results = {};
+  }
+}
+
+async function saveResults(){
+  try{
+    await window.storage.set(STORAGE_KEY, JSON.stringify(results), true);
+    noteSaved();
+  }catch(e){
+    savedNote.textContent = "บันทึกไม่สำเร็จ ลองใหม่อีกครั้ง";
+  }
+}
+
+function render(filter){
+  tbody.innerHTML = "";
+  const q = (filter || "").trim().toLowerCase();
+  students.forEach((s, i) => {
+    const [id, first, last] = s;
+    if(q && !(id.includes(q) || first.toLowerCase().includes(q) || last.toLowerCase().includes(q))){
+      return;
+    }
+    const tr = document.createElement("tr");
+
+    const tdIdx = document.createElement("td");
+    tdIdx.className = "idx";
+    tdIdx.textContent = i + 1;
+
+    const tdId = document.createElement("td");
+    tdId.className = "num";
+    tdId.textContent = id;
+
+    const tdFirst = document.createElement("td");
+    tdFirst.textContent = first;
+
+    const tdLast = document.createElement("td");
+    tdLast.textContent = last;
+
+    const tdStatus = document.createElement("td");
+    const statusCell = document.createElement("span");
+    statusCell.className = "status-cell";
+    const icon = document.createElement("span");
+    icon.className = "status-icon";
+    icon.innerHTML = STATUS_ICONS[results[id] || STATUS_OPTIONS[0]];
+    const select = document.createElement("select");
+    select.className = "status";
+    STATUS_OPTIONS.forEach(opt => {
+      const o = document.createElement("option");
+      o.value = opt;
+      o.textContent = opt;
+      select.appendChild(o);
+    });
+    const currentVal = results[id] || STATUS_OPTIONS[0];
+    select.value = currentVal;
+    select.dataset.val = currentVal;
+    statusCell.dataset.val = currentVal;
+    select.disabled = !isEditor;
+    select.addEventListener("change", async () => {
+      results[id] = select.value;
+      select.dataset.val = select.value;
+      statusCell.dataset.val = select.value;
+      icon.innerHTML = STATUS_ICONS[select.value];
+      await saveResults();
+    });
+    statusCell.append(icon, select);
+    tdStatus.appendChild(statusCell);
+
+    tr.append(tdIdx, tdId, tdFirst, tdLast, tdStatus);
+    tbody.appendChild(tr);
+  });
+}
+
+searchInput.addEventListener("input", () => render(searchInput.value));
+
+(async function init(){
+  renderAuthArea();
+  await loadResults();
+  render();
+})();
+</script>
+
+</body>
+</html>
